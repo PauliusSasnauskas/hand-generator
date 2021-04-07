@@ -1,0 +1,47 @@
+{
+    "startTop": true,
+    "items": [
+        {
+            "id": 0,
+            "orientation": [0, 1, 0],
+            "rotationAxis": [0, 1, 0],
+            "length": 4.5
+        },
+        {
+            "id": 1,
+            "orientation": [1, 0, 0],
+            "rotationAxis": null,
+            "length": 6
+        },
+        {
+            "id": 2,
+            "orientation": [0, 1, 0],
+            "rotationAxis": [1, 0, 0],
+            "length": 14
+        },
+        {
+            "id": 3,
+            "orientation": [1, 0, 0],
+            "rotationAxis": [0, 1, 0],
+            "length": 6
+        },
+        {
+            "id": 4,
+            "orientation": [0, 1, 0],
+            "rotationAxis": [1, 0, 0],
+            "length": 12
+        },
+        {
+            "id": 5,
+            "orientation": [-1, 0, 0],
+            "rotationAxis": [0, 1, 0],
+            "length": 3
+        },
+        {
+            "id": 6,
+            "orientation": [0, 1, 0],
+            "rotationAxis": [-1, 0, 0],
+            "length": 7
+        }
+    ]
+}
