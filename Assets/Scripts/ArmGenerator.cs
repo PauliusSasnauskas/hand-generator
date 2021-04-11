@@ -6,6 +6,7 @@ using System.IO;
 public class ArmGenerator : MonoBehaviour
 {
     public GameObject armGroup;
+    private GameObject armBase;
 
     private ArmStructure getObjFromFile(string fileName){
         string jsonString = new StreamReader(fileName).ReadToEnd();
@@ -48,18 +49,29 @@ public class ArmGenerator : MonoBehaviour
         rb.useGravity = false;
     }
 
-    private void addHingeJoint(GameObject partFrom, Vector3 joinPosition, GameObject partTo){
-
+    private void addHingeJoint(GameObject partFrom, Vector3 jointPosition, GameObject partTo, List<int> rotationAxis){
+        if (rotationAxis == null || rotationAxis.Count <= 0){
+            FixedJoint fj = partFrom.AddComponent<FixedJoint>();
+            fj.connectedBody = partTo.GetComponent<Rigidbody>();
+            return;
+        }
+        HingeJoint hj = partFrom.AddComponent<HingeJoint>();
+        hj.connectedBody = partTo.GetComponent<Rigidbody>();
+        hj.anchor = Vector3.up;
+        if (partFrom == armBase){
+            hj.anchor = new Vector3(0, 0.5f, 0);
+        }
+        hj.axis = new Vector3(rotationAxis[0], rotationAxis[1], rotationAxis[2]);
     }
 
     private void generateHandFromObject(ArmStructure obj){
         Vector3 currentPosition = Vector3.zero;
-        GameObject oldPart = armGroup;
+        GameObject oldPart = armBase;
 
         foreach (ArmItem item in obj.items){
             GameObject part = createAndOrientPart(item, ref currentPosition);
             addRigidBody(part);
-            addHingeJoint(oldPart, currentPosition, part);
+            addHingeJoint(oldPart, currentPosition, part, item.rotationAxis);
 
             oldPart = part;
         }
@@ -67,6 +79,8 @@ public class ArmGenerator : MonoBehaviour
 
     void Start()
     {
+        armBase = armGroup.transform.Find("ArmBase").gameObject;
+
         string fileName = "Assets/Scripts/hand_gen1.json";
 
         ArmStructure obj = getObjFromFile(fileName);
