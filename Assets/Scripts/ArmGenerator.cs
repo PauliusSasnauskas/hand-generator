@@ -31,16 +31,21 @@ public class ArmGenerator : MonoBehaviour
             part.transform.rotation *                               //   rotated height to the position so the currentPosition
             Vector3.Scale(part.transform.localScale, Vector3.up);   //   variable has the last part's top position
         
+        // Add a sphere to make it more nice looking
         GameObject partEnd = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         partEnd.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
         partEnd.transform.position = currentPosition;
         partEnd.transform.parent = part.transform;
+        Destroy(partEnd.GetComponent<SphereCollider>());
+        // End sphere
 
         return part;
     }
 
     private void addRigidBody(GameObject part){
-
+        Rigidbody rb = part.AddComponent<Rigidbody>();
+        // rb.mass = 5;
+        rb.useGravity = false;
     }
 
     private void addHingeJoint(GameObject partFrom, Vector3 joinPosition, GameObject partTo){
