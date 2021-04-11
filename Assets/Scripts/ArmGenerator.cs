@@ -33,6 +33,11 @@ public class ArmGenerator : MonoBehaviour
             oldPosition = part.transform.position +                     // Take current part top position, add it's
                 part.transform.rotation *                               //   rotated height to the position so the oldPosition
                 Vector3.Scale(part.transform.localScale, Vector3.up);   //   variable has the last part's top position
+            
+            GameObject partEnd = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            partEnd.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+            partEnd.transform.position = oldPosition;
+            partEnd.transform.parent = part.transform;
         }
     }
 
