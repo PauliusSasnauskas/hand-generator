@@ -4,19 +4,19 @@
         {
             "id": 0,
             "orientation": [0, 1, 0],
-            "rotationAxis": [0, 1, 0],
+            "rotationAxis": null,
             "length": 4.5
         },
         {
             "id": 1,
-            "orientation": [1, 0, 1],
-            "rotationAxis": null,
+            "orientation": [1, 0, 0],
+            "rotationAxis": [0, 1, 0],
             "length": 6
         },
         {
             "id": 2,
             "orientation": [0, 1, 0],
-            "rotationAxis": null,
+            "rotationAxis": [1, 0, 0],
             "length": 7
         }
     ]
