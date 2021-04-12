@@ -8,6 +8,8 @@ public class ArmGenerator : MonoBehaviour
     public GameObject armGroup;
     private GameObject armBase;
 
+    private HingeJoint testJoint;
+
     private ArmStructure getObjFromFile(string fileName){
         string jsonString = new StreamReader(fileName).ReadToEnd();
         ArmStructure obj = JsonUtility.FromJson<ArmStructure>(jsonString);
@@ -34,7 +36,7 @@ public class ArmGenerator : MonoBehaviour
         
         // Add a sphere to make it more nice looking
         GameObject partEnd = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        partEnd.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+        partEnd.transform.localScale = new Vector3(0.21f, 0.21f, 0.21f);
         partEnd.transform.position = currentPosition;
         partEnd.transform.parent = part.transform;
         Destroy(partEnd.GetComponent<SphereCollider>());
@@ -49,6 +51,8 @@ public class ArmGenerator : MonoBehaviour
         rb.useGravity = false;
     }
 
+    private List<HingeJoint> hingeJoints = new List<HingeJoint>();
+
     private void addHingeJoint(GameObject partFrom, Vector3 jointPosition, GameObject partTo, List<int> rotationAxis){
         if (rotationAxis == null || rotationAxis.Count <= 0){
             FixedJoint fj = partFrom.AddComponent<FixedJoint>();
@@ -59,9 +63,13 @@ public class ArmGenerator : MonoBehaviour
         hj.connectedBody = partTo.GetComponent<Rigidbody>();
         hj.anchor = Vector3.up;
         if (partFrom == armBase){
-            hj.anchor = new Vector3(0, 0.5f, 0);
+            hj.anchor /= 2;
         }
-        hj.axis = new Vector3(rotationAxis[0], rotationAxis[1], rotationAxis[2]);
+        Vector3 partAngles = Quaternion.Euler(90, 0, 0) * partFrom.transform.rotation.eulerAngles;
+        // 
+        hj.axis = partFrom.transform.rotation * Quaternion.Euler(-partAngles) * new Vector3(rotationAxis[0], rotationAxis[1], rotationAxis[2]);
+        
+        hingeJoints.Add(hj);
     }
 
     private void generateHandFromObject(ArmStructure obj){
@@ -81,11 +89,68 @@ public class ArmGenerator : MonoBehaviour
     {
         armBase = armGroup.transform.Find("ArmBase").gameObject;
 
-        string fileName = "Assets/Scripts/hand_gen1.json";
+        string fileName = "Assets/Scripts/hand_gen2.json";
 
         ArmStructure obj = getObjFromFile(fileName);
 
         generateHandFromObject(obj);
+    }
+
+    private const int turnVelocity = 30;
+    private const int turnForce = 100;
+
+    private int selectedPart = 0;
+
+    private void updateSelectedJoint(int amount){
+        var part = hingeJoints[selectedPart].gameObject;
+        var highlighSphereT = part.transform.Find("Sphere");
+        if (highlighSphereT != null){
+            var r = highlighSphereT.gameObject.GetComponent<Renderer>();
+            r.material.color = Color.white;
+        }
+
+        selectedPart += amount;
+        if (selectedPart < 0){ selectedPart = hingeJoints.Count - 1; }
+        selectedPart %= hingeJoints.Count;
+
+        
+        part = hingeJoints[selectedPart].gameObject;
+        highlighSphereT = part.transform.Find("Sphere");
+        if (highlighSphereT != null){
+            var r = highlighSphereT.gameObject.GetComponent<Renderer>();
+            r.material.color = Color.magenta;
+        }
+    }
+
+    void Update() {
+        var hj = hingeJoints[selectedPart];
+        var motor = hj.motor;
+
+        if (Input.GetKeyDown("up")){
+            hj.useMotor = true;
+            motor.targetVelocity = turnVelocity;
+            motor.force = turnForce;
+            hj.motor = motor;
+        }
+        if (Input.GetKeyDown("down")){
+            hj.useMotor = true;
+            motor.targetVelocity = -turnVelocity;
+            motor.force = turnForce;
+            hj.motor = motor;
+        }
+        if (Input.GetKeyUp("up") || Input.GetKeyUp("down")){
+            motor.targetVelocity = 0;
+            // motor.force = 0;
+            hj.motor = motor;
+            hj.useMotor = false;
+        }
+
+        if (Input.GetKeyDown("right")){
+            updateSelectedJoint(1);
+        }
+        if (Input.GetKeyDown("left")){            
+            updateSelectedJoint(-1);
+        }
     }
 }
 
