@@ -5,19 +5,50 @@
             "id": 0,
             "orientation": [0, 1, 0],
             "rotationAxis": null,
-            "length": 4.5
+            "length": 4.5,
+            "parent": -1
         },
         {
             "id": 1,
             "orientation": [1, 0, 0],
             "rotationAxis": [0, 1, 0],
-            "length": 6
+            "length": 6,
+            "parent": 0
         },
         {
             "id": 2,
             "orientation": [0, 1, 0],
             "rotationAxis": [1, 0, 0],
-            "length": 7
+            "length": 5,
+            "parent": 1
+        },
+        {
+            "id": 3,
+            "orientation": [1, 1, 0],
+            "rotationAxis": null,
+            "length": 4,
+            "parent": 2
+        },
+        {
+            "id": 4,
+            "orientation": [-1, 1, 0],
+            "rotationAxis": null,
+            "length": 4,
+            "parent": 2
+        },
+        {
+            "id": 5,
+            "orientation": [0, 1, 0],
+            "rotationAxis": [0, 0, 1],
+            "length": 5,
+            "parent": 3
+        },
+        {
+            "id": 6,
+            "orientation": [0, 1, 0],
+            "rotationAxis": [0, 0, 1],
+            "length": 5,
+            "parent": 4
         }
     ]
 }
