@@ -5,6 +5,8 @@ using System.IO;
 
 public class ArmGenerator : MonoBehaviour
 {
+    public bool needFixedJoints = true;
+
     public GameObject armGroup;
     private GameObject armBase;
     private float armWidth = 0.2f;
@@ -47,6 +49,7 @@ public class ArmGenerator : MonoBehaviour
     }
 
     private List<HingeJoint> hingeJoints = new List<HingeJoint>();
+    private List<FixedJoint> fixedJoints = new List<FixedJoint>();
 
     private void addHingeJoint(GameObject partFrom, Vector3 jointPosition, GameObject partTo, List<int> rotationAxis){
         if (rotationAxis == null || rotationAxis.Count <= 0){
@@ -132,8 +135,8 @@ public class ArmGenerator : MonoBehaviour
         generateHandFromObject(obj);
     }
 
-    private const int turnVelocity = 30;
-    private const int turnForce = 100;
+    public int turnVelocity = 30;
+    public  int turnForce = 100;
 
     private int selectedPart = 0;
 
@@ -156,6 +159,8 @@ public class ArmGenerator : MonoBehaviour
         part2.GetComponent<Renderer>().material.color = Color.blue;
             
     }
+
+
 
     void Update() {
         var hj = hingeJoints[selectedPart];
@@ -186,5 +191,7 @@ public class ArmGenerator : MonoBehaviour
             updateSelectedJoint(-1);
         }
     }
+
+
 }
 
