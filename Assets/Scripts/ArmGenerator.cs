@@ -15,7 +15,7 @@ public class ArmGenerator : MonoBehaviour
         return obj;
     }
 
-    private GameObject createAndOrientPart(ArmItem item, ref Vector3 currentPosition){
+    private GameObject createAndOrientPart(ArmItemData item, ref Vector3 currentPosition){
         GameObject part = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         part.transform.localScale = new Vector3(armWidth, item.length/10f, armWidth);
         part.transform.rotation = Quaternion.LookRotation(
@@ -87,7 +87,7 @@ public class ArmGenerator : MonoBehaviour
         fj.connectedBody = part.GetComponent<Rigidbody>();
     }
 
-    private void generateHandFromObject(ArmStructureData obj){
+    private ArmStructure generateHandFromObject(ArmStructureData obj){
         Vector3 currentPosition; // = Vector3.zero;
         GameObject oldPart; // = armBase;
 
@@ -95,7 +95,7 @@ public class ArmGenerator : MonoBehaviour
         Dictionary<int, GameObject> partSpheres = new Dictionary<int, GameObject>();
         Dictionary<int, Vector3> partEndPositions = new Dictionary<int, Vector3>();
 
-        foreach (ArmItem item in obj.items){
+        foreach (ArmItemData item in obj.items){
             if (item.parent == -1){
                 currentPosition = Vector3.zero;
             }else{
