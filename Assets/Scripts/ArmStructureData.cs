@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 
 [System.Serializable]
-public class ArmStructure {
+public class ArmStructureData {
     public bool startTop;
     public List<ArmItem> items;
 }
 
 [System.Serializable]
-public class ArmItem{
+public class ArmItemData{
     public int id;
     public List<int> orientation;
     public List<int> rotationAxis;

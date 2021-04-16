@@ -5,15 +5,13 @@ using System.IO;
 
 public class ArmGenerator : MonoBehaviour
 {
-    public bool needFixedJoints = true;
-
     public GameObject armGroup;
     private GameObject armBase;
     private float armWidth = 0.2f;
 
-    private ArmStructure getObjFromFile(string fileName){
+    private ArmStructureData getObjFromFile(string fileName){
         string jsonString = new StreamReader(fileName).ReadToEnd();
-        ArmStructure obj = JsonUtility.FromJson<ArmStructure>(jsonString);
+        ArmStructureData obj = JsonUtility.FromJson<ArmStructureData>(jsonString);
         return obj;
     }
 
@@ -89,7 +87,7 @@ public class ArmGenerator : MonoBehaviour
         fj.connectedBody = part.GetComponent<Rigidbody>();
     }
 
-    private void generateHandFromObject(ArmStructure obj){
+    private void generateHandFromObject(ArmStructureData obj){
         Vector3 currentPosition; // = Vector3.zero;
         GameObject oldPart; // = armBase;
 
@@ -130,7 +128,7 @@ public class ArmGenerator : MonoBehaviour
 
         string fileName = "Assets/Scripts/hand_gen2.json";
 
-        ArmStructure obj = getObjFromFile(fileName);
+        ArmStructureData obj = getObjFromFile(fileName);
 
         generateHandFromObject(obj);
     }
