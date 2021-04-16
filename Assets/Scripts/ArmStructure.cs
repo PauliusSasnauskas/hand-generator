@@ -12,4 +12,5 @@ public class ArmItem{
     public List<int> orientation;
     public List<int> rotationAxis;
     public float length;
+    public int parent;
 }

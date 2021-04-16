@@ -7,8 +7,7 @@ public class ArmGenerator : MonoBehaviour
 {
     public GameObject armGroup;
     private GameObject armBase;
-
-    private HingeJoint testJoint;
+    private float armWidth = 0.2f;
 
     private ArmStructure getObjFromFile(string fileName){
         string jsonString = new StreamReader(fileName).ReadToEnd();
@@ -18,7 +17,7 @@ public class ArmGenerator : MonoBehaviour
 
     private GameObject createAndOrientPart(ArmItem item, ref Vector3 currentPosition){
         GameObject part = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        part.transform.localScale = new Vector3(0.2f, item.length/10f, 0.2f);
+        part.transform.localScale = new Vector3(armWidth, item.length/10f, armWidth);
         part.transform.rotation = Quaternion.LookRotation(
             new Vector3(item.orientation[0], item.orientation[1], item.orientation[2]),
             Vector3.up
@@ -33,14 +32,10 @@ public class ArmGenerator : MonoBehaviour
         currentPosition = part.transform.position +                 // Take current part top position, add it's
             part.transform.rotation *                               //   rotated height to the position so the currentPosition
             Vector3.Scale(part.transform.localScale, Vector3.up);   //   variable has the last part's top position
-        
-        // Add a sphere to make it more nice looking
-        GameObject partEnd = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        partEnd.transform.localScale = new Vector3(0.21f, 0.21f, 0.21f);
-        partEnd.transform.position = currentPosition;
-        partEnd.transform.parent = part.transform;
-        Destroy(partEnd.GetComponent<SphereCollider>());
-        // End sphere
+
+
+        // resize Arm so parts don't get stuck in each other    
+        part.transform.localScale = new Vector3(armWidth, item.length/10f - armWidth/2, armWidth);
 
         return part;
     }
@@ -66,22 +61,63 @@ public class ArmGenerator : MonoBehaviour
             hj.anchor /= 2;
         }
         Vector3 partAngles = Quaternion.Euler(90, 0, 0) * partFrom.transform.rotation.eulerAngles;
-        // 
         hj.axis = partFrom.transform.rotation * Quaternion.Euler(-partAngles) * new Vector3(rotationAxis[0], rotationAxis[1], rotationAxis[2]);
         
+        var motor = hj.motor;
+        motor.force = turnForce;
+        hj.motor = motor;
+
+        hj.useMotor = true;
+
         hingeJoints.Add(hj);
     }
 
+    private void addSphereToPart(GameObject part, Vector3 currentPosition){
+        // Add a sphere to make it more nice looking
+        GameObject partSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        partSphere.transform.localScale = new Vector3(armWidth, armWidth, armWidth);
+        partSphere.transform.position = currentPosition;
+        partSphere.transform.parent = armGroup.transform; // part.transform;
+        Destroy(partSphere.GetComponent<SphereCollider>());
+
+        addRigidBody(partSphere);
+
+        FixedJoint fj = partSphere.AddComponent<FixedJoint>();
+        fj.connectedBody = part.GetComponent<Rigidbody>();
+    }
+
     private void generateHandFromObject(ArmStructure obj){
-        Vector3 currentPosition = Vector3.zero;
-        GameObject oldPart = armBase;
+        Vector3 currentPosition; // = Vector3.zero;
+        GameObject oldPart; // = armBase;
+
+        Dictionary<int, GameObject> parts = new Dictionary<int, GameObject>();
+        Dictionary<int, GameObject> partSpheres = new Dictionary<int, GameObject>();
+        Dictionary<int, Vector3> partEndPositions = new Dictionary<int, Vector3>();
 
         foreach (ArmItem item in obj.items){
+            if (item.parent == -1){
+                currentPosition = Vector3.zero;
+            }else{
+                currentPosition = partEndPositions[(int)item.parent];
+            }
+
             GameObject part = createAndOrientPart(item, ref currentPosition);
+
             addRigidBody(part);
+            addSphereToPart(part, currentPosition);
+            
+            parts[item.id] = part;
+            partEndPositions[item.id] = currentPosition;
+
+
+            if (item.parent == -1){
+                oldPart = armBase;
+            }else{
+                oldPart = parts[(int)item.parent];
+            }
             addHingeJoint(oldPart, currentPosition, part, item.rotationAxis);
 
-            oldPart = part;
+            // oldPart = part;
         }
     }
 
@@ -103,11 +139,10 @@ public class ArmGenerator : MonoBehaviour
 
     private void updateSelectedJoint(int amount){
         var part = hingeJoints[selectedPart].gameObject;
-        var highlighSphereT = part.transform.Find("Sphere");
-        if (highlighSphereT != null){
-            var r = highlighSphereT.gameObject.GetComponent<Renderer>();
-            r.material.color = Color.white;
-        }
+        var part2 = hingeJoints[selectedPart].connectedBody.gameObject;
+
+        part.GetComponent<Renderer>().material.color = Color.white;
+        part2.GetComponent<Renderer>().material.color = Color.white;
 
         selectedPart += amount;
         if (selectedPart < 0){ selectedPart = hingeJoints.Count - 1; }
@@ -115,34 +150,33 @@ public class ArmGenerator : MonoBehaviour
 
         
         part = hingeJoints[selectedPart].gameObject;
-        highlighSphereT = part.transform.Find("Sphere");
-        if (highlighSphereT != null){
-            var r = highlighSphereT.gameObject.GetComponent<Renderer>();
-            r.material.color = Color.magenta;
-        }
+        part2 = hingeJoints[selectedPart].connectedBody.gameObject;
+        
+        part.GetComponent<Renderer>().material.color = Color.blue;
+        part2.GetComponent<Renderer>().material.color = Color.blue;
+            
     }
 
     void Update() {
         var hj = hingeJoints[selectedPart];
         var motor = hj.motor;
 
-        if (Input.GetKeyDown("up")){
+        if (Input.GetKeyDown("up") || Input.GetKeyDown("down")){
             hj.useMotor = true;
-            motor.targetVelocity = turnVelocity;
+            if (Input.GetKeyDown("up")){
+                motor.targetVelocity = turnVelocity;
+            }else{
+                motor.targetVelocity = -turnVelocity;
+            }
             motor.force = turnForce;
             hj.motor = motor;
         }
-        if (Input.GetKeyDown("down")){
-            hj.useMotor = true;
-            motor.targetVelocity = -turnVelocity;
-            motor.force = turnForce;
-            hj.motor = motor;
-        }
+
         if (Input.GetKeyUp("up") || Input.GetKeyUp("down")){
             motor.targetVelocity = 0;
             // motor.force = 0;
             hj.motor = motor;
-            hj.useMotor = false;
+            // hj.useMotor = false;
         }
 
         if (Input.GetKeyDown("right")){
