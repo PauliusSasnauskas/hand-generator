@@ -8,6 +8,7 @@ public class ArmGenerator : MonoBehaviour
     public GameObject armGroup;
     private GameObject armBase;
     private float armWidth = 0.2f;
+    public int turnForce = 100;
 
     private ArmStructureData getObjFromFile(string fileName){
         string jsonString = new StreamReader(fileName).ReadToEnd();
@@ -37,6 +38,8 @@ public class ArmGenerator : MonoBehaviour
         // resize Arm so parts don't get stuck in each other    
         part.transform.localScale = new Vector3(armWidth, item.length/10f - armWidth/2, armWidth);
 
+        addRigidBody(part);
+
         return part;
     }
 
@@ -46,14 +49,11 @@ public class ArmGenerator : MonoBehaviour
         rb.useGravity = false;
     }
 
-    private List<HingeJoint> hingeJoints = new List<HingeJoint>();
-    private List<FixedJoint> fixedJoints = new List<FixedJoint>();
-
-    private void addHingeJoint(GameObject partFrom, Vector3 jointPosition, GameObject partTo, List<int> rotationAxis){
+    private Joint addHingeJoint(GameObject partFrom, Vector3 jointPosition, GameObject partTo, List<int> rotationAxis){
         if (rotationAxis == null || rotationAxis.Count <= 0){
             FixedJoint fj = partFrom.AddComponent<FixedJoint>();
             fj.connectedBody = partTo.GetComponent<Rigidbody>();
-            return;
+            return fj;
         }
         HingeJoint hj = partFrom.AddComponent<HingeJoint>();
         hj.connectedBody = partTo.GetComponent<Rigidbody>();
@@ -70,7 +70,7 @@ public class ArmGenerator : MonoBehaviour
 
         hj.useMotor = true;
 
-        hingeJoints.Add(hj);
+        return hj;
     }
 
     private void addSphereToPart(GameObject part, Vector3 currentPosition){
@@ -88,40 +88,34 @@ public class ArmGenerator : MonoBehaviour
     }
 
     private ArmStructure generateHandFromObject(ArmStructureData obj){
-        Vector3 currentPosition; // = Vector3.zero;
-        GameObject oldPart; // = armBase;
 
+        ArmStructure armStructure = new ArmStructure(armGroup, armBase);
+        
         Dictionary<int, GameObject> parts = new Dictionary<int, GameObject>();
-        Dictionary<int, GameObject> partSpheres = new Dictionary<int, GameObject>();
         Dictionary<int, Vector3> partEndPositions = new Dictionary<int, Vector3>();
 
         foreach (ArmItemData item in obj.items){
-            if (item.parent == -1){
-                currentPosition = Vector3.zero;
-            }else{
-                currentPosition = partEndPositions[(int)item.parent];
-            }
+
+            Vector3 currentPosition = (item.parent <= -1 ? Vector3.zero : partEndPositions[(int)item.parent]);
 
             GameObject part = createAndOrientPart(item, ref currentPosition);
-
-            addRigidBody(part);
             addSphereToPart(part, currentPosition);
             
             parts[item.id] = part;
             partEndPositions[item.id] = currentPosition;
 
 
-            if (item.parent == -1){
-                oldPart = armBase;
-            }else{
-                oldPart = parts[(int)item.parent];
-            }
-            addHingeJoint(oldPart, currentPosition, part, item.rotationAxis);
-
-            // oldPart = part;
+            GameObject oldPart = (item.parent <= -1 ? armBase : parts[item.parent]);
+            Joint j = addHingeJoint(oldPart, currentPosition, part, item.rotationAxis);
+            
+            ArmItem a = new ArmItem(j);
+            armStructure.items.Add(a);
         }
+
+        return armStructure;
     }
 
+    private ArmStructure arm;
     void Start()
     {
         armBase = armGroup.transform.Find("ArmBase").gameObject;
@@ -130,65 +124,13 @@ public class ArmGenerator : MonoBehaviour
 
         ArmStructureData obj = getObjFromFile(fileName);
 
-        generateHandFromObject(obj);
+        arm = generateHandFromObject(obj);
     }
 
-    public int turnVelocity = 30;
-    public  int turnForce = 100;
-
-    private int selectedPart = 0;
-
-    private void updateSelectedJoint(int amount){
-        var part = hingeJoints[selectedPart].gameObject;
-        var part2 = hingeJoints[selectedPart].connectedBody.gameObject;
-
-        part.GetComponent<Renderer>().material.color = Color.white;
-        part2.GetComponent<Renderer>().material.color = Color.white;
-
-        selectedPart += amount;
-        if (selectedPart < 0){ selectedPart = hingeJoints.Count - 1; }
-        selectedPart %= hingeJoints.Count;
-
-        
-        part = hingeJoints[selectedPart].gameObject;
-        part2 = hingeJoints[selectedPart].connectedBody.gameObject;
-        
-        part.GetComponent<Renderer>().material.color = Color.blue;
-        part2.GetComponent<Renderer>().material.color = Color.blue;
-            
+    public ArmStructure GetArm(){
+        return arm;
     }
 
-
-
-    void Update() {
-        var hj = hingeJoints[selectedPart];
-        var motor = hj.motor;
-
-        if (Input.GetKeyDown("up") || Input.GetKeyDown("down")){
-            hj.useMotor = true;
-            if (Input.GetKeyDown("up")){
-                motor.targetVelocity = turnVelocity;
-            }else{
-                motor.targetVelocity = -turnVelocity;
-            }
-            motor.force = turnForce;
-            hj.motor = motor;
-        }
-
-        if (Input.GetKeyUp("up") || Input.GetKeyUp("down")){
-            motor.targetVelocity = 0;
-            // motor.force = 0;
-            hj.motor = motor;
-            // hj.useMotor = false;
-        }
-
-        if (Input.GetKeyDown("right")){
-            updateSelectedJoint(1);
-        }
-        if (Input.GetKeyDown("left")){            
-            updateSelectedJoint(-1);
-        }
-    }
 
 
 }

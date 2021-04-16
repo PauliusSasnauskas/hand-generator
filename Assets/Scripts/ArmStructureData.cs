@@ -3,7 +3,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public class ArmStructureData {
     public bool startTop;
-    public List<ArmItem> items;
+    public List<ArmItemData> items;
 }
 
 [System.Serializable]
