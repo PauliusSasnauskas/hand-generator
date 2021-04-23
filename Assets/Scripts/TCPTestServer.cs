@@ -9,6 +9,7 @@ using UnityEngine;
 
 public class TCPTestServer : MonoBehaviour
 {
+
 	#region private members 	
 	/// <summary> 	
 	/// TCPListener to listen for incomming TCP connection 	
@@ -71,6 +72,7 @@ public class TCPTestServer : MonoBehaviour
 							// Convert byte array to string message. 							
 							string clientMessage = Encoding.ASCII.GetString(incommingData);
 							Debug.Log("client message received as: " + clientMessage);
+							CommandRunner.runCommand(clientMessage);
 						}
 					}
 				}

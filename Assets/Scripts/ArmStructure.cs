@@ -50,4 +50,15 @@ public class ArmItem {
         j.gameObject.GetComponent<Renderer>().material.color = c;
         j.connectedBody.gameObject.GetComponent<Renderer>().material.color = c;
     }
+
+
+    public void JustMove()
+    {
+        if (j is HingeJoint hj)
+        {
+            var motor = hj.motor;
+            motor.targetVelocity = 20f;
+            hj.motor = motor;
+        }
+    }
 }
