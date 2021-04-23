@@ -14,6 +14,8 @@ public class ArmStructure {
 public class ArmItem {
     private Joint j;
 
+    public float targetDegree = 0;
+
     public ArmItem(Joint j){
         this.j = j;
     }

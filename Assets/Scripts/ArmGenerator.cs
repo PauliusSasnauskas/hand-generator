@@ -118,6 +118,7 @@ public class ArmGenerator : MonoBehaviour
     }
 
     private ArmStructure arm;
+
     void Start()
     {
         armBase = armGroup.transform.Find("ArmBase").gameObject;
@@ -129,11 +130,13 @@ public class ArmGenerator : MonoBehaviour
         arm = generateHandFromObject(obj);
 
         // TODO, DELETE THIS, MAKE CLASSES NON STATIC
-        foreach(ArmItem j in arm.items)
+        JointMover jointMover = GetComponent<JointMover>();
+        foreach (ArmItem j in arm.items)
         {
             if (j.IsTurnable())
             {
                 CommandRunner.hingeItems.Add(j);
+                jointMover.hingeItems.Add(j);
             }
         }
     }

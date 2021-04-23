@@ -13,15 +13,12 @@ public static class CommandRunner
     {
         Debug.Log("We got following command: " + command.ToString());
 
-        int[] velocities = command.Split(' ').Select(n => Convert.ToInt32(n)).ToArray();
-        for(int i=0;i<velocities.Length;i++)
+        int[] degrees = command.Split(' ').Select(n => Convert.ToInt32(n)).ToArray();
+        for(int i=0;i<degrees.Length;i++)
         {
-            Debug.Log("i = " + i.ToString());
+            float d = degrees[i];
+            hingeItems[i].targetDegree = d;
 
-            UnityMainThreadDispatcher.Instance().Enqueue(() => {
-                hingeItems[i].JustMove();
-            });
-            
         }
 
 
