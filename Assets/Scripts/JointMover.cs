@@ -6,26 +6,47 @@ public class JointMover : MonoBehaviour
 {
 
     public List<ArmItem> hingeItems = new List<ArmItem>();
+    public float EPLSILON = 1.5f;
 
-    public float EPLSILON = 10f;
+    public float SPEED = 5;
 
-    void Update()
+    private int cnt = 25;
+
+    void FixedUpdate()
     {
+        string msg = "Current degrees: ";
+        string target = "Target degrees: ";
+        string velocities = "Velocities :";
+        
         foreach(ArmItem j in hingeItems)
         {
+
+            msg += j.GetAngle().ToString() + " ";
+            target += j.targetDegree.ToString() + " ";
+            velocities += j.GetTurnVelocity() + " ";
+
             if(j.targetDegree - j.GetAngle() > EPLSILON)
             {
-                j.SetTurnVelocity(10);
+                j.SetTurnVelocity(-SPEED);
             }
             else if(j.targetDegree - j.GetAngle() < -EPLSILON)
             {
-                j.SetTurnVelocity(-10);
+                j.SetTurnVelocity(SPEED);
             }
             else
             {
-                j.SetTurnVelocity(0);
+                j.SetTurnVelocity(0.0f);
             }
 
         }
+        cnt--;
+        if(cnt == 0)
+        {
+            Debug.Log(msg);
+            Debug.Log(target);
+            Debug.Log(velocities);
+            cnt = 100;
+        }
+        
     }
 }

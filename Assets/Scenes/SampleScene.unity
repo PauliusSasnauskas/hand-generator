@@ -198,6 +198,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EPLSILON: 0.1
+  SPEED: 2
 --- !u!1 &83721914
 GameObject:
   m_ObjectHideFlags: 0
