@@ -27,15 +27,15 @@ public class JointMover : MonoBehaviour
 
             if(j.targetDegree - j.GetAngle() > EPLSILON)
             {
-                j.SetTurnVelocity(-SPEED);
+                j.Move(-SPEED);
             }
             else if(j.targetDegree - j.GetAngle() < -EPLSILON)
             {
-                j.SetTurnVelocity(SPEED);
+                j.Move(SPEED);
             }
             else
             {
-                j.SetTurnVelocity(0.0f);
+                j.Move(0.0f);
             }
 
         }

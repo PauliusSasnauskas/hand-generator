@@ -60,6 +60,10 @@ public class ArmItem {
             cj.targetPosition = targetPos;
         }
     }
+
+    public bool IsTurnable(){
+        return j is HingeJoint;
+    }
     public float GetTurnVelocity(){
         if (j is HingeJoint hj){
             var motor = hj.motor;
