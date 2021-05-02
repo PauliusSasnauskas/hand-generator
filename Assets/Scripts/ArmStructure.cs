@@ -14,6 +14,8 @@ public class ArmStructure {
 public class ArmItem {
     private Joint j;
 
+    public float targetDegree = 0;
+
     public ArmItem(Joint j){
         this.j = j;
     }
@@ -32,7 +34,12 @@ public class ArmItem {
 
     public float GetAngle(){
         if (j is HingeJoint hj){
-            return hj.angle;
+            
+            Quaternion a = this.GetPartFrom().transform.rotation;
+            Quaternion b = this.GetPartTo().transform.rotation;
+
+            return Quaternion.Angle(a,b);
+
         }else{
             return -1000f;
         }
@@ -53,9 +60,16 @@ public class ArmItem {
             cj.targetPosition = targetPos;
         }
     }
-
+    public float GetTurnVelocity(){
+        if (j is HingeJoint hj){
+            var motor = hj.motor;
+            return motor.targetVelocity;
+        }
+        return 0f;
+    }
     public void SetColor(Color c){
         j.gameObject.GetComponent<Renderer>().material.color = c;
         j.connectedBody.gameObject.GetComponent<Renderer>().material.color = c;
     }
+
 }

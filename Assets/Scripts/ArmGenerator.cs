@@ -55,6 +55,7 @@ public class ArmGenerator : MonoBehaviour
             return fj;
         }
         HingeJoint hj = partFrom.AddComponent<HingeJoint>();
+        
         hj.connectedBody = partTo.GetComponent<Rigidbody>();
         hj.anchor = Vector3.up;
         if (partFrom == armBase){
@@ -116,6 +117,7 @@ public class ArmGenerator : MonoBehaviour
         fj.connectedBody = part.GetComponent<Rigidbody>();
     }
 
+
     private ArmStructure generateHandFromObject(ArmStructureData obj){
 
         ArmStructure armStructure = new ArmStructure(armGroup, armBase);
@@ -162,6 +164,7 @@ public class ArmGenerator : MonoBehaviour
     }
 
     private ArmStructure arm;
+
     void Start()
     {
         armBase = armGroup.transform.Find("ArmBase").gameObject;
@@ -171,6 +174,17 @@ public class ArmGenerator : MonoBehaviour
         ArmStructureData obj = getObjFromFile(fileName);
 
         arm = generateHandFromObject(obj);
+
+        // TODO, DELETE THIS, MAKE CLASSES NON STATIC
+        JointMover jointMover = GetComponent<JointMover>();
+        foreach (ArmItem j in arm.items)
+        {
+            if (j.IsTurnable())
+            {
+                CommandRunner.hingeItems.Add(j);
+                jointMover.hingeItems.Add(j);
+            }
+        }
     }
 
     public ArmStructure GetArm(){
