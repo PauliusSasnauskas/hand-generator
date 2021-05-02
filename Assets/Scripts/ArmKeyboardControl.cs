@@ -5,7 +5,7 @@ public class ArmKeyboardControl : MonoBehaviour
 {
     public ArmGenerator armGenerator;
     private int selectedPart;
-    private List<ArmItem> turnableItems = new List<ArmItem>();
+    private List<ArmItem> movableItems = new List<ArmItem>();
     IEnumerator Start(){
         if (armGenerator.GetArm() == null){ yield return null; } // Waiting for arm to load
 
@@ -13,44 +13,45 @@ public class ArmKeyboardControl : MonoBehaviour
 
         for (int i = 0; i < arm.items.Count; i++){
             ArmItem item = arm.items[i];
-            if (!item.IsTurnable()){ continue; }
-            turnableItems.Add(item);
+            if (item.IsMovable()){
+                movableItems.Add(item);
+            }
         }
 
         updateSelectedJoint();
     }
 
-    public int turnVelocity = 30;
+    public int moveVelocity = 30;
 
     private void updateSelectedJoint(int amount = 0){
-        ArmItem turnItem = turnableItems[selectedPart];
-        turnItem.SetColor(Color.white);
+        ArmItem moveItem = movableItems[selectedPart];
+        moveItem.SetColor(Color.white);
 
         selectedPart += amount;
-        if (selectedPart < 0){ selectedPart = turnableItems.Count - 1; }
-        selectedPart %= turnableItems.Count;
+        if (selectedPart < 0){ selectedPart = movableItems.Count - 1; }
+        selectedPart %= movableItems.Count;
 
-        turnItem = turnableItems[selectedPart];
-        turnItem.SetColor(Color.blue);
+        moveItem = movableItems[selectedPart];
+        moveItem.SetColor(Color.blue);
     }
 
     void Update() {
-        if (turnableItems == null || turnableItems.Count <= 0) { return; }
+        if (movableItems == null || movableItems.Count <= 0) { return; }
 
-        ArmItem turnItem = turnableItems[selectedPart];
+        ArmItem moveItem = movableItems[selectedPart];
 
-        if (Input.GetKeyDown("up") || Input.GetKeyDown("down")){
-            if (Input.GetKeyDown("up")){
-                turnItem.SetTurnVelocity(turnVelocity);
+        if (Input.GetKey("up") || Input.GetKey("down")){
+            if (Input.GetKey("up")){
+                moveItem.Move(moveVelocity);
             }else{
-                turnItem.SetTurnVelocity(-turnVelocity);
+                moveItem.Move(-moveVelocity);
             }
 
-            print(turnItem.GetAngle());
+            // print(moveItem.GetAngle());
         }
 
         if (Input.GetKeyUp("up") || Input.GetKeyUp("down")){
-            turnItem.SetTurnVelocity(0);
+            moveItem.Move(0);
         }
 
         if (Input.GetKeyDown("right")){

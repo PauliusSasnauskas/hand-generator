@@ -3,45 +3,63 @@
     "items": [
         {
             "id": 0,
+            "width": 2,
             "orientation": [0, 1, 0],
             "rotationAxis": [0, 1, 0],
-            "length": 4.5
+            "length": 4.5,
+            "parent": -1
         },
         {
             "id": 1,
+            "width": 2,
             "orientation": [1, 0, 0],
             "rotationAxis": null,
-            "length": 6
+            "length": 6,
+            "parent": 0
         },
         {
             "id": 2,
+            "width": 2,
             "orientation": [0, 1, 0],
             "rotationAxis": [1, 0, 0],
-            "length": 14
+            "length": 14,
+            "parent": 1
         },
         {
             "id": 3,
+            "width": 2,
             "orientation": [1, 0, 0],
             "rotationAxis": [0, 1, 0],
-            "length": 6
+            "length": 6,
+            "parent": 2
         },
         {
             "id": 4,
+            "width": 2,
             "orientation": [0, 1, 0],
             "rotationAxis": [1, 0, 0],
-            "length": 12
+            "length": 12,
+            "parent": 3
         },
         {
             "id": 5,
+            "width": 2,
             "orientation": [-1, 0, 0],
             "rotationAxis": [0, 1, 0],
-            "length": 3
+            "length": 3,
+            "parent": 4
         },
         {
             "id": 6,
+            "width": 2,
             "orientation": [0, 1, 0],
             "rotationAxis": [-1, 0, 0],
-            "length": 7
+            "length": 7,
+            "telescope": {
+                "id": 7,
+                "width": 1.5
+            },
+            "parent": 5
         }
     ]
 }

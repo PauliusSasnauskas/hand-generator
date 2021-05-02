@@ -9,8 +9,16 @@ public class ArmStructureData {
 [System.Serializable]
 public class ArmItemData{
     public int id;
+    public float width;
     public List<int> orientation;
     public List<int> rotationAxis;
     public float length;
+    public ArmItemTelescopeData telescope = null;
     public int parent;
+}
+
+[System.Serializable]
+public class ArmItemTelescopeData {
+    public int id;
+    public float width = -1;
 }

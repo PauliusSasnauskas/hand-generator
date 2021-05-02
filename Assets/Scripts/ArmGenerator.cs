@@ -7,7 +7,6 @@ public class ArmGenerator : MonoBehaviour
 {
     public GameObject armGroup;
     private GameObject armBase;
-    private float armWidth = 0.2f;
     public int turnForce = 100;
 
     private ArmStructureData getObjFromFile(string fileName){
@@ -18,7 +17,7 @@ public class ArmGenerator : MonoBehaviour
 
     private GameObject createAndOrientPart(ArmItemData item, ref Vector3 currentPosition){
         GameObject part = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        part.transform.localScale = new Vector3(armWidth, item.length/10f, armWidth);
+        part.transform.localScale = new Vector3(item.width/10f, item.length/10f, item.width/10f);
         part.transform.rotation = Quaternion.LookRotation(
             new Vector3(item.orientation[0], item.orientation[1], item.orientation[2]),
             Vector3.up
@@ -35,8 +34,8 @@ public class ArmGenerator : MonoBehaviour
             Vector3.Scale(part.transform.localScale, Vector3.up);   //   variable has the last part's top position
 
 
-        // resize Arm so parts don't get stuck in each other    
-        part.transform.localScale = new Vector3(armWidth, item.length/10f - armWidth/2, armWidth);
+        // resize Arm so parts don't get stuck in each other
+        part.transform.localScale = new Vector3(item.width/10f, item.length/10f - item.width/20f, item.width/10f);
 
         addRigidBody(part);
 
@@ -73,10 +72,40 @@ public class ArmGenerator : MonoBehaviour
         return hj;
     }
 
-    private void addSphereToPart(GameObject part, Vector3 currentPosition){
+    private Joint addSlideJoint(GameObject partFrom, GameObject partTo){
+        ConfigurableJoint cj = partFrom.AddComponent<ConfigurableJoint>();
+        cj.connectedBody = partTo.GetComponent<Rigidbody>();
+
+        cj.autoConfigureConnectedAnchor = false;
+
+        cj.anchor = Vector3.up;
+        cj.connectedAnchor = Vector3.zero;
+
+        cj.xMotion = ConfigurableJointMotion.Locked;
+        cj.yMotion = ConfigurableJointMotion.Limited; // Allow Y movement
+        cj.zMotion = ConfigurableJointMotion.Locked;
+        cj.angularXMotion = ConfigurableJointMotion.Locked;
+        cj.angularYMotion = ConfigurableJointMotion.Locked;
+        cj.angularZMotion = ConfigurableJointMotion.Locked;
+
+        var limit = cj.linearLimit;
+        limit.limit = partFrom.transform.localScale.y;
+        cj.linearLimit = limit;
+
+        var drive = cj.yDrive;
+        drive.positionSpring = 1000;
+        cj.yDrive = drive;
+
+        cj.targetVelocity = new Vector3(0, 100, 0);
+        cj.targetPosition = new Vector3(0, -partFrom.transform.localScale.y, 0);
+
+        return cj;
+    }
+
+    private void addSphereToPart(GameObject part, Vector3 currentPosition, float width){
         // Add a sphere to make it more nice looking
         GameObject partSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        partSphere.transform.localScale = new Vector3(armWidth, armWidth, armWidth);
+        partSphere.transform.localScale = new Vector3(width, width, width);
         partSphere.transform.position = currentPosition;
         partSphere.transform.parent = armGroup.transform; // part.transform;
         Destroy(partSphere.GetComponent<SphereCollider>());
@@ -95,21 +124,38 @@ public class ArmGenerator : MonoBehaviour
         Dictionary<int, Vector3> partEndPositions = new Dictionary<int, Vector3>();
 
         foreach (ArmItemData item in obj.items){
-
+            // Take last position to start from
             Vector3 currentPosition = (item.parent <= -1 ? Vector3.zero : partEndPositions[(int)item.parent]);
 
+            // Create the part
             GameObject part = createAndOrientPart(item, ref currentPosition);
-            addSphereToPart(part, currentPosition);
             
             parts[item.id] = part;
             partEndPositions[item.id] = currentPosition;
 
-
+            // Find old part to connect to
             GameObject oldPart = (item.parent <= -1 ? armBase : parts[item.parent]);
             Joint j = addHingeJoint(oldPart, currentPosition, part, item.rotationAxis);
             
             ArmItem a = new ArmItem(j);
             armStructure.items.Add(a);
+
+            if (item.telescope == null || item.telescope.width <= 0){
+                addSphereToPart(part, currentPosition, item.width/10f); // Add sphere to end
+            } else {
+                // Add telescope if there is one
+                GameObject telescopePart = GameObject.Instantiate(part);
+                telescopePart.transform.localScale = new Vector3(item.telescope.width/10f, part.transform.localScale.y, item.telescope.width/10f);
+                telescopePart.transform.parent = armGroup.transform;
+                addSphereToPart(telescopePart, currentPosition, item.width/10f);
+
+                Joint jt = addSlideJoint(part, telescopePart);
+                ArmItem at = new ArmItem(jt);
+                armStructure.items.Add(at);
+
+                parts[item.telescope.id] = telescopePart;
+                partEndPositions[item.telescope.id] = currentPosition;
+            }
         }
 
         return armStructure;
@@ -120,7 +166,7 @@ public class ArmGenerator : MonoBehaviour
     {
         armBase = armGroup.transform.Find("ArmBase").gameObject;
 
-        string fileName = "Assets/Scripts/hand_gen2.json";
+        string fileName = "Assets/Scripts/hand_gen1.json";
 
         ArmStructureData obj = getObjFromFile(fileName);
 

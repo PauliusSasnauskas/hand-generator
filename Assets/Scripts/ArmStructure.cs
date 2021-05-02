@@ -18,8 +18,8 @@ public class ArmItem {
         this.j = j;
     }
 
-    public bool IsTurnable(){
-        return j is HingeJoint;
+    public bool IsMovable(){
+        return j is HingeJoint || j is ConfigurableJoint;
     }
 
     public GameObject GetPartFrom(){
@@ -38,11 +38,19 @@ public class ArmItem {
         }
     }
 
-    public void SetTurnVelocity(float turnVelocity){
+    public void Move(float amount){
         if (j is HingeJoint hj){
             var motor = hj.motor;
-            motor.targetVelocity = turnVelocity;
+            motor.targetVelocity = amount;
             hj.motor = motor;
+            return;
+        }
+        if (j is ConfigurableJoint cj){
+            var targetPos = cj.targetPosition;
+            targetPos.y += amount / 10000f;
+            if (targetPos.y > cj.linearLimit.limit){ targetPos.y = cj.linearLimit.limit; }
+            if (targetPos.y < -cj.linearLimit.limit){ targetPos.y = -cj.linearLimit.limit; }
+            cj.targetPosition = targetPos;
         }
     }
 
