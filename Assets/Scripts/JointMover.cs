@@ -11,6 +11,17 @@ public class JointMover : MonoBehaviour
     public float SPEED = 5;
 
     private int cnt = 25;
+    public ArmGenerator armGenerator;
+    IEnumerator Start(){
+        if (armGenerator.GetArm() == null){ yield return null; } // Waiting for arm to load
+        ArmStructure arm = armGenerator.GetArm();
+
+        foreach (ArmItem j in arm.items){
+            if (j.IsTurnable()){
+                hingeItems.Add(j);
+            }
+        }
+    }
 
     void FixedUpdate()
     {

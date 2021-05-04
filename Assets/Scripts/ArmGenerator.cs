@@ -182,7 +182,6 @@ public class ArmGenerator : MonoBehaviour
             if (j.IsTurnable())
             {
                 CommandRunner.hingeItems.Add(j);
-                jointMover.hingeItems.Add(j);
             }
         }
     }
