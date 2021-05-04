@@ -27,7 +27,7 @@ public class JointMover : MonoBehaviour
     {
         string msg = "Current degrees: ";
         string target = "Target degrees: ";
-        string velocities = "Velocities :";
+        string velocities = "Velocities: ";
         
         foreach(ArmItem j in hingeItems)
         {
@@ -36,16 +36,16 @@ public class JointMover : MonoBehaviour
             target += j.targetDegree.ToString() + " ";
             velocities += j.GetTurnVelocity() + " ";
 
-            if(j.targetDegree - j.GetAngle() > EPLSILON)
-            {
-                j.Move(-SPEED);
-            }
-            else if(j.targetDegree - j.GetAngle() < -EPLSILON)
-            {
-                j.Move(SPEED);
-            }
-            else
-            {
+            var angleDiff = j.targetDegree - j.GetAngle();
+
+            var sendSpeed = SPEED*Mathf.Abs(angleDiff/30);
+            if (sendSpeed > SPEED){ sendSpeed = SPEED; }
+
+            if(angleDiff > EPLSILON) {
+                j.Move(-sendSpeed);
+            } else if(angleDiff < -EPLSILON) {
+                j.Move(sendSpeed);
+            } else {
                 j.Move(0.0f);
             }
 

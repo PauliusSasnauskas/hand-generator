@@ -13,11 +13,18 @@ public class ArmStructure {
 
 public class ArmItem {
     private Joint j;
+    private GameObject angleCompare;
+    private GameObject jointSphere;
 
     public float targetDegree = 0;
 
-    public ArmItem(Joint j){
+    public ArmItem(Joint j, GameObject angleCompare = null){
         this.j = j;
+        this.angleCompare = angleCompare;
+    }
+
+    public void SetSphere(GameObject jointSphere){
+        this.jointSphere = jointSphere;
     }
 
     public bool IsMovable(){
@@ -34,12 +41,28 @@ public class ArmItem {
 
     public float GetAngle(){
         if (j is HingeJoint hj){
+            var plane1 = this.angleCompare.transform.position;
+            var plane2 = this.GetPartFrom().transform.position;
+            var plane3 = plane2 + this.GetPartFrom().transform.up;
+
+            var planeX = this.GetPartTo().transform.position;
+
+            plane1 = plane1 - plane3;
+            plane2 = plane2 - plane3;
+            planeX = planeX - plane3;
+
+            var a = plane1.x; var b = plane1.y; var c = plane1.z;
+            var d = plane2.x; var e = plane2.y; var f = plane2.z;
+            var g = planeX.x; var h = planeX.y; var i = planeX.z;
             
-            Quaternion a = this.GetPartFrom().transform.rotation;
-            Quaternion b = this.GetPartTo().transform.rotation;
+            var side = a*(e*i-f*h) - b*(d*i-f*g) + c*(d*h-e*g);
 
-            return Quaternion.Angle(a,b);
 
+            Quaternion rot1 = this.angleCompare.transform.rotation;
+            Quaternion rot2 = this.GetPartTo().transform.rotation;
+
+            if (side > 0){ return -Quaternion.Angle(rot1,rot2); }
+            return Quaternion.Angle(rot1,rot2);
         }else{
             return -1000f;
         }

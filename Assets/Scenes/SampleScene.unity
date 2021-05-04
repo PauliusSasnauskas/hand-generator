@@ -198,7 +198,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EPLSILON: 0.1
-  SPEED: 2
+  SPEED: 10
+  armGenerator: {fileID: 42352171}
 --- !u!1 &83721914
 GameObject:
   m_ObjectHideFlags: 0

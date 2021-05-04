@@ -47,7 +47,7 @@ public class ArmKeyboardControl : MonoBehaviour
                 moveItem.Move(-moveVelocity);
             }
 
-            // print(moveItem.GetAngle());
+            print("Angle: " + moveItem.GetAngle().ToString());
         }
 
         if (Input.GetKeyUp("up") || Input.GetKeyUp("down")){

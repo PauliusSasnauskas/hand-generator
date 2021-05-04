@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
+
 public class ArmGenerator : MonoBehaviour
 {
+    public const bool HELPERS_VISIBLE = false;
     public GameObject armGroup;
     private GameObject armBase;
     public int turnForce = 100;
@@ -62,7 +64,7 @@ public class ArmGenerator : MonoBehaviour
             hj.anchor /= 2;
         }
         Vector3 partAngles = Quaternion.Euler(90, 0, 0) * partFrom.transform.rotation.eulerAngles;
-        hj.axis = partFrom.transform.rotation * Quaternion.Euler(-partAngles) * new Vector3(rotationAxis[0], rotationAxis[1], rotationAxis[2]);
+        hj.axis = partFrom.transform.rotation * Quaternion.Euler(-partAngles) * new Vector3(rotationAxis[0], -rotationAxis[1], rotationAxis[2]);
         
         var motor = hj.motor;
         motor.force = turnForce;
@@ -103,7 +105,7 @@ public class ArmGenerator : MonoBehaviour
         return cj;
     }
 
-    private void addSphereToPart(GameObject part, Vector3 currentPosition, float width){
+    private GameObject addSphereToPart(GameObject part, Vector3 currentPosition, float width){
         // Add a sphere to make it more nice looking
         GameObject partSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         partSphere.transform.localScale = new Vector3(width, width, width);
@@ -115,6 +117,8 @@ public class ArmGenerator : MonoBehaviour
 
         FixedJoint fj = partSphere.AddComponent<FixedJoint>();
         fj.connectedBody = part.GetComponent<Rigidbody>();
+
+        return partSphere;
     }
 
 
@@ -131,28 +135,49 @@ public class ArmGenerator : MonoBehaviour
 
             // Create the part
             GameObject part = createAndOrientPart(item, ref currentPosition);
+
             
             parts[item.id] = part;
             partEndPositions[item.id] = currentPosition;
 
             // Find old part to connect to
             GameObject oldPart = (item.parent <= -1 ? armBase : parts[item.parent]);
+
+            // TODO: fix
+            // Create relative part for angle checking
+            GameObject partRest = GameObject.Instantiate(part);
+            partRest.transform.parent = armGroup.transform;
+            var fj = oldPart.AddComponent<FixedJoint>();
+            fj.connectedBody = partRest.GetComponent<Rigidbody>();
+            partRest.GetComponent<Rigidbody>().mass = 0;
+            if (HELPERS_VISIBLE){
+                var newcolor = new Color(0.5f, 0, 0, 0.2f);
+                partRest.GetComponent<Renderer>().material.color = newcolor;
+            }else{
+                Destroy(partRest.GetComponent<Renderer>());
+            }
+            Destroy(partRest.GetComponent<CapsuleCollider>());
+
+
+            // Connect to old part
             Joint j = addHingeJoint(oldPart, currentPosition, part, item.rotationAxis);
             
-            ArmItem a = new ArmItem(j);
+            ArmItem a = new ArmItem(j, partRest);
             armStructure.items.Add(a);
 
             if (item.telescope == null || item.telescope.width <= 0){
-                addSphereToPart(part, currentPosition, item.width/10f); // Add sphere to end
+                GameObject sphere = addSphereToPart(part, currentPosition, item.width/10f); // Add sphere to end
+                a.SetSphere(sphere);
             } else {
                 // Add telescope if there is one
                 GameObject telescopePart = GameObject.Instantiate(part);
                 telescopePart.transform.localScale = new Vector3(item.telescope.width/10f, part.transform.localScale.y, item.telescope.width/10f);
                 telescopePart.transform.parent = armGroup.transform;
-                addSphereToPart(telescopePart, currentPosition, item.width/10f);
+                GameObject sphere = addSphereToPart(telescopePart, currentPosition, item.width/10f);
 
                 Joint jt = addSlideJoint(part, telescopePart);
                 ArmItem at = new ArmItem(jt);
+                at.SetSphere(sphere);
                 armStructure.items.Add(at);
 
                 parts[item.telescope.id] = telescopePart;
@@ -176,7 +201,6 @@ public class ArmGenerator : MonoBehaviour
         arm = generateHandFromObject(obj);
 
         // TODO, DELETE THIS, MAKE CLASSES NON STATIC
-        JointMover jointMover = GetComponent<JointMover>();
         foreach (ArmItem j in arm.items)
         {
             if (j.IsTurnable())
