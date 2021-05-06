@@ -7,16 +7,10 @@ public class ArmKeyboardControl : MonoBehaviour
     private int selectedPart;
     private List<ArmItem> movableItems = new List<ArmItem>();
     IEnumerator Start(){
-        if (armGenerator.GetArm() == null){ yield return null; } // Waiting for arm to load
+        if (ArmGenerator.GetArm() == null){ yield return null; } // Waiting for arm to load
 
-        ArmStructure arm = armGenerator.GetArm();
-
-        for (int i = 0; i < arm.items.Count; i++){
-            ArmItem item = arm.items[i];
-            if (item.IsMovable()){
-                movableItems.Add(item);
-            }
-        }
+        // movableItems = ArmGenerator.GetArm().GetHingeItems();
+        movableItems = ArmGenerator.GetArm().GetMovableItems();
 
         updateSelectedJoint();
     }

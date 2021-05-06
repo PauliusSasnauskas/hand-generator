@@ -4,27 +4,53 @@ public class ArmStructure {
     public GameObject armGroup;
     public GameObject armBase;
     public List<ArmItem> items = new List<ArmItem>();
+    private GameObject targetObj;
 
     public ArmStructure(GameObject armGroup, GameObject armBase){
         this.armGroup = armGroup;
         this.armBase = armBase;
+    }
+    public List<ArmItem> GetHingeItems(){
+        List<ArmItem> l = new List<ArmItem>();
+        foreach (ArmItem j in this.items){
+            if (j.IsTurnable()){
+                l.Add(j);
+            }
+        }
+        return l;
+    }
+    public List<ArmItem> GetMovableItems(){
+        List<ArmItem> l = new List<ArmItem>();
+        foreach (ArmItem j in this.items){
+            if (j.IsMovable()){
+                l.Add(j);
+            }
+        }
+        return l;
+    }
+    public void SetTarget(Vector3 target){
+        if (targetObj == null){
+            targetObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            targetObj.GetComponent<Renderer>().material.color = Color.red;
+            targetObj.transform.localScale *= 0.5f;
+            targetObj.transform.parent = armBase.transform;
+        }
+
+        this.targetObj.transform.localPosition = target;
     }
 }
 
 public class ArmItem {
     private Joint j;
     private GameObject angleCompare;
-    private GameObject jointSphere;
+    private GameObject partVisual;
 
     public float targetDegree = 0;
 
-    public ArmItem(Joint j, GameObject angleCompare = null){
+    public ArmItem(Joint j, GameObject partVisual = null, GameObject angleCompare = null){
         this.j = j;
         this.angleCompare = angleCompare;
-    }
-
-    public void SetSphere(GameObject jointSphere){
-        this.jointSphere = jointSphere;
+        this.partVisual = partVisual;
     }
 
     public bool IsMovable(){
@@ -95,8 +121,8 @@ public class ArmItem {
         return 0f;
     }
     public void SetColor(Color c){
-        j.gameObject.GetComponent<Renderer>().material.color = c;
-        j.connectedBody.gameObject.GetComponent<Renderer>().material.color = c;
+        partVisual.GetComponent<Renderer>().material.color = c;
+        // j.connectedBody.gameObject.GetComponent<Renderer>().material.color = c;
     }
 
 }

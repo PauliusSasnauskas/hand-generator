@@ -1,0 +1,29 @@
+{
+    "startTop": true,
+    "items": [
+        {
+            "id": 0,
+            "parent": -1,
+            "rotationAxis": null,
+            "orientation": [0, 1, 0],
+            "width": 0.5,
+            "length": 0.9
+        },
+        {
+            "id": 1,
+            "parent": 0,
+            "rotationAxis": "y",
+            "orientation": [0, 0, 1],
+            "width": 0.5,
+            "length": 1.05
+        },
+        {
+            "id": 2,
+            "parent": 1,
+            "rotationAxis": "z",
+            "orientation": [1, 0, 0],
+            "width": 0.5,
+            "length": 3.3
+        }
+    ]
+}

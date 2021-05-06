@@ -11,7 +11,7 @@ public class ArmItemData{
     public int id;
     public float width;
     public List<int> orientation;
-    public List<int> rotationAxis;
+    public string rotationAxis;
     public float length;
     public ArmItemTelescopeData telescope = null;
     public int parent;
