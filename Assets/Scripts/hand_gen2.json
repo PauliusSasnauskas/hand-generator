@@ -7,7 +7,8 @@
             "rotationAxis": null,
             "orientation": [0, 1, 0],
             "width": 0.5,
-            "length": 0.9
+            "length": 0.9,
+            "mass": 0.709
         },
         {
             "id": 1,
@@ -15,51 +16,65 @@
             "rotationAxis": "y",
             "orientation": [0, 0, 1],
             "width": 0.5,
-            "length": 1.05
+            "length": 1.05,
+            "mass": 1.082
         },
         {
             "id": 2,
             "parent": 1,
             "rotationAxis": "z",
             "orientation": [1, 0, 0],
+            "telescope": {
+                "id": 3,
+                "mass": 0.744,
+                "extend": 0.15,
+                "width": 0.43
+            },
             "width": 0.5,
-            "length": 3.3
-        },
-        {
-            "id": 3,
-            "parent": 2,
-            "rotationAxis": null,
-            "orientation": [0, 0, -1],
-            "width": 0.5,
-            "length": 1.05
+            "length": 3.3,
+            "mass": 0.330
         },
         {
             "id": 4,
             "parent": 3,
-            "rotationAxis": "z",
-            "orientation": [-1, 0, 0],
+            "rotationAxis": null,
+            "orientation": [0, 0, -1],
             "width": 0.5,
-            "length": 2.75
+            "length": 1.05,
+            "mass": 1.084
         },
         {
             "id": 5,
             "parent": 4,
+            "rotationAxis": "z",
+            "orientation": [-1, 0, 0],
+            "telescope": {
+                "id": 6,
+                "mass": 1.195,
+                "extend": 0.095,
+                "width": 0.43
+            },
+            "width": 0.5,
+            "length": 2.75,
+            "mass": 0.246
+        },
+        {
+            "id": 7,
+            "parent": 6,
             "rotationAxis": "x",
             "orientation": [0, 0, -1],
             "width": 0.5,
-            "length": 1.05
+            "length": 1.05,
+            "mass": 1.081
         },
         {
-            "id": 6,
-            "parent": 5,
+            "id": 8,
+            "parent": 7,
             "rotationAxis": "z",
             "orientation": [1, 0, 0],
-            "telescope": {
-                "id": 7,
-                "width": 0.4
-            },
             "width": 0.5,
-            "length": 2.05
+            "length": 2.05,
+            "mass": 1.152
         }
     ]
 }

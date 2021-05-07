@@ -12,13 +12,15 @@ public class ArmItemData{
     public float width;
     public List<int> orientation;
     public string rotationAxis;
-    public float length;
     public ArmItemTelescopeData telescope = null;
+    public float length;
     public int parent;
+    public float mass;
 }
 
 [System.Serializable]
 public class ArmItemTelescopeData {
     public int id;
     public float width = -1;
+    public float mass;
 }

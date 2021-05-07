@@ -41,7 +41,7 @@ public class ArmGenerator : MonoBehaviour
         part.transform.localScale = new Vector3(item.width, (item.length - item.width)/2f, item.width);
 
 
-        addRigidBody(part);
+        addRigidBody(part, item.mass);
 
         return part;
     }
@@ -124,7 +124,7 @@ public class ArmGenerator : MonoBehaviour
         partSphere.transform.parent = armGroup.transform; // part.transform;
         Destroy(partSphere.GetComponent<SphereCollider>());
 
-        addRigidBody(partSphere);
+        addRigidBody(partSphere, 0);
 
         FixedJoint fj = partSphere.AddComponent<FixedJoint>();
         fj.connectedBody = part.GetComponent<Rigidbody>();
@@ -203,6 +203,8 @@ public class ArmGenerator : MonoBehaviour
                 telescopePart.transform.localScale = new Vector3(item.telescope.width, part.transform.localScale.y, item.telescope.width);
                 telescopePart.transform.parent = armGroup.transform;
                 GameObject sphere = addSphereToPart(telescopePart, currentPosition, item.width);
+
+                telescopePart.GetComponent<Rigidbody>().mass = item.telescope.mass;
 
                 Joint jt = addSlideJoint(part, telescopePart);
                 ArmItem at = new ArmItem(jt, telescopePart);
