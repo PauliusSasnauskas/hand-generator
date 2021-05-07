@@ -8,7 +8,7 @@ public class JointMover : MonoBehaviour
     public List<ArmItem> hingeItems = new List<ArmItem>();
     public float EPLSILON = 1.5f;
 
-    public float SPEED = 5;
+    public float SPEED = 30;
 
     private int cnt = 25;
     public ArmGenerator armGenerator;

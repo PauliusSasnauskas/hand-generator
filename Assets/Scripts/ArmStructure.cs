@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-public class ArmStructure {
+public class ArmStructure : MonoBehaviour {
     public GameObject armGroup;
     public GameObject armBase;
     public List<ArmItem> items = new List<ArmItem>();
@@ -31,9 +31,11 @@ public class ArmStructure {
     public void SetTarget(Vector3 target){
         if (targetObj == null){
             targetObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            targetObj.name = "Target";
+            Destroy(targetObj.GetComponent<SphereCollider>());
             targetObj.GetComponent<Renderer>().material.color = Color.red;
             targetObj.transform.localScale *= 0.5f;
-            targetObj.transform.parent = armBase.transform;
+            targetObj.transform.parent = armGroup.transform;
         }
 
         this.targetObj.transform.localPosition = target;
@@ -87,7 +89,7 @@ public class ArmItem {
             Quaternion rot1 = this.angleCompare.transform.rotation;
             Quaternion rot2 = this.GetPartTo().transform.rotation;
 
-            if (side > 0){ return -Quaternion.Angle(rot1,rot2); }
+            if (side < 0){ return -Quaternion.Angle(rot1,rot2); }
             return Quaternion.Angle(rot1,rot2);
         }else{
             return -1000f;

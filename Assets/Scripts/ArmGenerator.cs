@@ -230,11 +230,11 @@ public class ArmGenerator : MonoBehaviour
         arm = generateHandFromObject(obj);
 
         // TODO: fix
-        arm.GetHingeItems()[0].targetDegree = -43f;
-        arm.GetHingeItems()[1].targetDegree = 25f;
-        arm.GetHingeItems()[2].targetDegree = -20f;
-        arm.GetHingeItems()[3].targetDegree = 80f;
-        arm.GetHingeItems()[4].targetDegree = 50f;
+        // arm.GetHingeItems()[0].targetDegree = -43f;
+        // arm.GetHingeItems()[1].targetDegree = 25f;
+        // arm.GetHingeItems()[2].targetDegree = -20f;
+        // arm.GetHingeItems()[3].targetDegree = 80f;
+        // arm.GetHingeItems()[4].targetDegree = 50f;
     }
 
     public static ArmStructure GetArm(){

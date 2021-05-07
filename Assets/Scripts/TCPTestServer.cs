@@ -52,7 +52,7 @@ public class TCPTestServer : MonoBehaviour
 		try
 		{
 			// Create listener on localhost port 8052. 			
-			tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8052);
+			tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8053);
 			tcpListener.Start();
 			Debug.Log("Server is listening");
 			Byte[] bytes = new Byte[1024];
