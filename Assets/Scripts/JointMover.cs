@@ -8,7 +8,7 @@ public class JointMover : MonoBehaviour
     public List<ArmItem> hingeItems = new List<ArmItem>();
     public float EPLSILON = 1.5f;
 
-    public float SPEED = 30;
+    public const float SPEED = 10;
 
     private int cnt = 25;
     public ArmGenerator armGenerator;
@@ -18,26 +18,37 @@ public class JointMover : MonoBehaviour
         hingeItems = ArmGenerator.GetArm().GetHingeItems();
     }
 
+    private static float PickValid180(params float[] values){
+        float best = values[0];
+        foreach (float val in values){
+            if (val > 180f || val < -180f){ continue; }
+            best = val;
+        }
+        return best;
+    }
+
     void FixedUpdate(){
         string msg = "Current degrees: ";
         string target = "Target degrees: ";
         string velocities = "Velocities: ";
         
+        int i = 0;
+
         foreach(ArmItem j in hingeItems) {
             msg += j.GetAngle().ToString() + " ";
             target += j.targetDegree.ToString() + " ";
             velocities += j.GetTurnVelocity() + " ";
 
-            var angleDiff = j.GetAngle() - j.targetDegree;
-            var angleDiffOther = 360f - j.GetAngle() + j.targetDegree;
+            var angleDiff0 = j.GetAngle() - j.targetDegree;
+            var angleDiff1 = angleDiff0 - 360f;
+            var angleDiff2 = angleDiff0 + 360f;
 
-            if (angleDiffOther < angleDiff){
-                angleDiff = -angleDiffOther;
-            }
+            var angleDiff = PickValid180(angleDiff0, angleDiff1, angleDiff2);
 
-            var sendSpeed = SPEED*Mathf.Abs(angleDiff/30);
-            if (sendSpeed > SPEED){ sendSpeed = SPEED; }
+            var maxSpeed = SPEED;
 
+            var sendSpeed = maxSpeed*Mathf.Abs(angleDiff/10);
+            if (sendSpeed > maxSpeed){ sendSpeed = maxSpeed; }
             
             if(angleDiff > EPLSILON){
                 j.SetColor(Color.Lerp(Color.white, Color.red, sendSpeed/SPEED));
@@ -49,7 +60,7 @@ public class JointMover : MonoBehaviour
                 j.SetColor(Color.white);
                 j.Move(0.0f);
             }
-
+            i++;
         }
         cnt--;
         if(cnt == 0){

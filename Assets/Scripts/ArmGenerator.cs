@@ -19,7 +19,7 @@ public class ArmGenerator : MonoBehaviour
 
     private GameObject createAndOrientPart(ArmItemData item, ref Vector3 currentPosition){
         GameObject part = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        part.name = "Solid Limb";
+        part.name = "Limb";
         part.transform.localScale = new Vector3(item.width, (item.length - item.width)/2f, item.width);
         part.transform.rotation = Quaternion.LookRotation(
             new Vector3(item.orientation[0], item.orientation[1], item.orientation[2]),
@@ -118,7 +118,7 @@ public class ArmGenerator : MonoBehaviour
     private GameObject addSphereToPart(GameObject part, Vector3 currentPosition, float width){
         // Add a sphere to make it more nice looking
         GameObject partSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        partSphere.name = "Joint Sphere";
+        partSphere.name = "Joint";
         partSphere.transform.localScale = new Vector3(width, width, width);
         partSphere.transform.position = currentPosition;
         partSphere.transform.parent = armGroup.transform; // part.transform;
@@ -149,7 +149,7 @@ public class ArmGenerator : MonoBehaviour
 
             // Create part for visuals
             GameObject partVisual = GameObject.Instantiate(part);
-            partVisual.name = "Visual Limb";
+            partVisual.name = "Limb Visual";
             partVisual.transform.parent = armGroup.transform;
             Destroy(partVisual.GetComponent<CapsuleCollider>());
             addRigidBody(partVisual, 0);
@@ -166,7 +166,7 @@ public class ArmGenerator : MonoBehaviour
             // TODO: fix
             // Create relative part for angle checking
             GameObject partRest = GameObject.Instantiate(part);
-            partRest.name = "Invisible Helper Limb";
+            partRest.name = "Limb Helper Invisible";
             partRest.transform.parent = armGroup.transform;
             addRigidBody(partRest, 0);
             var fj = oldPart.AddComponent<FixedJoint>();
@@ -199,7 +199,7 @@ public class ArmGenerator : MonoBehaviour
             } else {
                 // Add telescope if there is one
                 GameObject telescopePart = GameObject.Instantiate(part);
-                telescopePart.name = "Solid Limb Telescope";
+                telescopePart.name = "Limb Telescope";
                 telescopePart.transform.localScale = new Vector3(item.telescope.width, part.transform.localScale.y, item.telescope.width);
                 telescopePart.transform.parent = armGroup.transform;
                 GameObject sphere = addSphereToPart(telescopePart, currentPosition, item.width);

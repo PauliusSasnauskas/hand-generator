@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-public class ArmStructure : MonoBehaviour {
+public class ArmStructure : ScriptableObject {
     public GameObject armGroup;
     public GameObject armBase;
     public List<ArmItem> items = new List<ArmItem>();
@@ -29,16 +29,24 @@ public class ArmStructure : MonoBehaviour {
         return l;
     }
     public void SetTarget(Vector3 target){
+        FixedJoint fj;
         if (targetObj == null){
             targetObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             targetObj.name = "Target";
             Destroy(targetObj.GetComponent<SphereCollider>());
             targetObj.GetComponent<Renderer>().material.color = Color.red;
             targetObj.transform.localScale *= 0.5f;
-            targetObj.transform.parent = armGroup.transform;
+            targetObj.transform.parent = GameObject.Find("Zero").transform;
+            var rb = targetObj.AddComponent<Rigidbody>();
+            rb.mass = 0;
+            rb.useGravity = false;
+            fj = targetObj.AddComponent<FixedJoint>();
+            fj.connectedBody = armBase.GetComponent<Rigidbody>();
         }
-
+        fj = targetObj.GetComponent<FixedJoint>();
+        fj.connectedBody = null;
         this.targetObj.transform.localPosition = target;
+        fj.connectedBody = armBase.GetComponent<Rigidbody>();
     }
 }
 
