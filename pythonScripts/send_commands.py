@@ -21,6 +21,12 @@ def send_command(strCmd):
     s.send(strCmd)
     s.close()
 
+def angles(listAngles, verbose=False):
+    degreeCommand = degrees_to_bytestring(listAngles)
+    send_command(degreeCommand)
+    if verbose:
+        print("Sending command:", degreeCommand)
+
 def ik(x, y, z, showVisualization=False, verbose=False):
     targetCommand = bytes(f"target {x} {y} {z}", 'utf-8')
 
@@ -44,5 +50,3 @@ if __name__ == "__main__":
     eePos = input("Input position of end effector (X Y Z): ")
     targetPos = [list(map(float, eePos.split(" ")))]
     calc_and_send(target[0], target[1], target[2])
-
-    
