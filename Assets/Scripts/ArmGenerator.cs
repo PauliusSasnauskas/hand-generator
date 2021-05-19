@@ -11,6 +11,8 @@ public class ArmGenerator : MonoBehaviour
     private GameObject armBase;
     public int turnForce = 100;
 
+    public string generateFromFile = "hand_gen2.json";
+
     private ArmStructureData getObjFromFile(string fileName){
         string jsonString = new StreamReader(fileName).ReadToEnd();
         ArmStructureData obj = JsonUtility.FromJson<ArmStructureData>(jsonString);
@@ -225,18 +227,10 @@ public class ArmGenerator : MonoBehaviour
     {
         armBase = armGroup.transform.Find("ArmBase").gameObject;
 
-        string fileName = "Assets/Scripts/hand_gen2.json";
-
-        ArmStructureData obj = getObjFromFile(fileName);
+        // string fileName = "Assets/Scripts/hand_gen2.json";
+        ArmStructureData obj = getObjFromFile("Assets/Scripts/" + generateFromFile);
 
         arm = generateHandFromObject(obj);
-
-        // TODO: fix
-        // arm.GetHingeItems()[0].targetDegree = -43f;
-        // arm.GetHingeItems()[1].targetDegree = 25f;
-        // arm.GetHingeItems()[2].targetDegree = -20f;
-        // arm.GetHingeItems()[3].targetDegree = 80f;
-        // arm.GetHingeItems()[4].targetDegree = 50f;
     }
 
     public static ArmStructure GetArm(){

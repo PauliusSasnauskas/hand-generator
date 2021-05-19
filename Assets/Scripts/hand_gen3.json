@@ -7,23 +7,31 @@
             "rotationAxis": null,
             "orientation": [0, 1, 0],
             "width": 0.5,
-            "length": 0.9
+            "motor": {
+                "dimensions": null,
+                "mass": null,
+                "offset": null
+            },
+            "length": 1,
+            "mass": 1
         },
         {
             "id": 1,
             "parent": 0,
             "rotationAxis": "y",
-            "orientation": [0, 0, 1],
+            "orientation": [1, 0, 0],
             "width": 0.5,
-            "length": 1.05
+            "length": 2,
+            "mass": 1
         },
         {
             "id": 2,
             "parent": 1,
-            "rotationAxis": "z",
-            "orientation": [1, 0, 0],
+            "rotationAxis": "x",
+            "orientation": [0, 1, 0],
             "width": 0.5,
-            "length": 3.3
+            "length": 5,
+            "mass": 1
         }
     ]
 }
